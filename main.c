@@ -1,33 +1,26 @@
 #include <stdio.h>
-#include <stdlib.h> // Подключение библиотеки для работы с динамической памятью
-#include <string.h> // Подключение библиотеки для работы со строками
+#include <stdlib.h>
+#include <string.h>
 
-// Определение структуры для хранения данных о письме
 struct Letter {
-    char *adr1;    // Указатель на строку с адресом получателя
-    char *fam1;    // Указатель на строку с фамилией получателя
-    char *name1;   // Указатель на строку с именем получателя
-    char *adr2;    // Указатель на строку с адресом отправителя
-    char *fam2;    // Указатель на строку с фамилией отправителя
-    char *name2;   // Указатель на строку с именем отправителя
-    double cost;   // Стоимость письма
+    char *adr1;
+    char *fam1;
+    char *name1;
+    char *adr2;
+    char *fam2;
+    char *name2;
+    double cost;
 };
 
-// Функция для добавления нового письма в базу данных
-// Принимает указатель на базу данных (массив структур) и количество писем в базе
-// Возвращает обновленное количество писем в базе
 int add_letter(struct Letter **letters, int count) {
-    // Выделяем память под новую структуру письма, увеличивая размер массива
     *letters = (struct Letter *)realloc(*letters, (count + 1) * sizeof(struct Letter));
-    // Получаем указатель на новую структуру письма
     struct Letter *new_letter = &(*letters)[count];
 
-    // Ввод данных о письме с клавиатуры
-    char buffer[1024]; // Буфер для временного хранения вводимых строк
-    printf("Введите адрес получателя: "); // Вывод сообщения для пользователя
-    fgets(buffer, sizeof(buffer), stdin); // Чтение строки с клавиатуры в буфер
-    buffer[strcspn(buffer, "\n")] = 0; // Удаляем символ новой строки из буфера
-    new_letter->adr1 = strdup(buffer); // Копируем строку из буфера в динамическую память и сохраняем указатель
+    char buffer[1024];
+    printf("Введите адрес получателя: ");
+    fgets(buffer, sizeof(buffer), stdin);
+    buffer[strcspn(buffer, "\n")] = 0;
+    new_letter->adr1 = strdup(buffer);
 
     printf("Введите фамилию получателя: ");
     fgets(buffer, sizeof(buffer), stdin);
@@ -55,147 +48,252 @@ int add_letter(struct Letter **letters, int count) {
     new_letter->name2 = strdup(buffer);
 
     printf("Введите стоимость письма: ");
-    scanf("%lf", &new_letter->cost); // Чтение вещественного числа с клавиатуры
-    getchar(); // Очищаем буфер ввода от символа новой строки
+    scanf("%lf", &new_letter->cost);
+    getchar();
 
-    return count + 1; // Возвращаем обновленное количество писем
+    return count + 1;
 }
 
-// Функция для печати информации о письме
-// Принимает указатель на структуру письма
 void print_letter(struct Letter *letter) {
-    printf("Адрес получателя: %s\n", letter->adr1); // Вывод адреса получателя
-    printf("Фамилия получателя: %s\n", letter->fam1); // Вывод фамилии получателя
-    printf("Имя получателя: %s\n", letter->name1); // Вывод имени получателя
-    printf("Адрес отправителя: %s\n", letter->adr2); // Вывод адреса отправителя
-    printf("Фамилия отправителя: %s\n", letter->fam2); // Вывод фамилии отправителя
-    printf("Имя отправителя: %s\n", letter->name2); // Вывод имени отправителя
-    printf("Стоимость: %.2lf\n\n", letter->cost); // Вывод стоимости письма
+    printf("Адрес получателя: %s\n", letter->adr1);
+    printf("Фамилия получателя: %s\n", letter->fam1);
+    printf("Имя получателя: %s\n", letter->name1);
+    printf("Адрес отправителя: %s\n", letter->adr2);
+    printf("Фамилия отправителя: %s\n", letter->fam2);
+    printf("Имя отправителя: %s\n", letter->name2);
+    printf("Стоимость: %.2lf\n\n", letter->cost);
 }
 
-// Функция для печати всей базы данных писем
-// Принимает указатель на базу данных (массив структур) и количество писем в базе
 void print_letters(struct Letter *letters, int count) {
-    if (count == 0) { // Проверка на пустую базу данных
+    if (count == 0) {
         printf("База данных пуста.\n");
         return;
     }
 
-    printf("------------------------------\n"); // Вывод разделителя
-    for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
-        print_letter(&letters[i]); // Вывод информации о текущем письме
-        printf("------------------------------\n"); // Вывод разделителя
+    printf("------------------------------\n");
+    for (int i = 0; i < count; i++) {
+        print_letter(&letters[i]);
+        printf("------------------------------\n");
     }
 }
 
-// Функция для поиска письма по фамилии и имени отправителя
-// Принимает указатель на базу данных, количество писем, фамилию и имя для поиска
-// Выводит на экран найденные письма
 void find_by_sender(struct Letter *letters, int count, char *fam2, char *name2) {
-    int found = 0; // Флаг, указывающий, было ли найдено хотя бы одно письмо
-    for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
-        // Сравнение фамилии и имени отправителя с заданными значениями
+    int found = 0;
+    for (int i = 0; i < count; i++) {
         if (strcmp(letters[i].fam2, fam2) == 0 && strcmp(letters[i].name2, name2) == 0) {
-            print_letter(&letters[i]); // Вывод информации о найденном письме
-            found = 1; // Установка флага, что письмо найдено
+            print_letter(&letters[i]);
+            found = 1;
         }
     }
-    if (!found) { // Если ни одного письма не найдено
-        printf("Письма от %s %s не найдены.\n", fam2, name2); // Вывод сообщения об отсутствии писем
+    if (!found) {
+        printf("Письма от %s %s не найдены.\n", fam2, name2);
     }
 }
 
-// Функция для поиска писем со стоимостью выше заданной
-// Принимает указатель на базу данных, количество писем и минимальную стоимость
-// Выводит на экран найденные письма
 void find_by_cost(struct Letter *letters, int count, double min_cost) {
-    int found = 0; // Флаг, указывающий, было ли найдено хотя бы одно письмо
-    for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
-        if (letters[i].cost > min_cost) { // Сравнение стоимости письма с заданным значением
-            print_letter(&letters[i]); // Вывод информации о найденном письме
-            found = 1; // Установка флага, что письмо найдено
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (letters[i].cost > min_cost) {
+            print_letter(&letters[i]);
+            found = 1;
         }
     }
-    if (!found) { // Если ни одного письма не найдено
-        printf("Письма дороже %.2lf не найдены.\n", min_cost); // Вывод сообщения об отсутствии писем
+    if (!found) {
+        printf("Письма дороже %.2lf не найдены.\n", min_cost);
     }
 }
 
-// Функция для сравнения двух писем по стоимости (для qsort)
 int compare_letters_by_cost(const void *a, const void *b) {
-    double cost_a = ((struct Letter *)a)->cost; // Получение стоимости первого письма
-    double cost_b = ((struct Letter *)b)->cost; // Получение стоимости второго письма
-    return (cost_b - cost_a); // Возвращаем разницу стоимостей для сортировки по убыванию
+    double cost_a = ((struct Letter *)a)->cost;
+    double cost_b = ((struct Letter *)b)->cost;
+    return (cost_b - cost_a);
 }
 
-// Функция для сортировки базы данных по убыванию стоимости
-// Принимает указатель на базу данных и количество писем
 void sort_by_cost(struct Letter *letters, int count) {
-    qsort(letters, count, sizeof(struct Letter), compare_letters_by_cost); // Сортировка массива структур
-    printf("База данных отсортирована по убыванию стоимости.\n"); // Вывод сообщения о завершении сортировки
+    qsort(letters, count, sizeof(struct Letter), compare_letters_by_cost);
+    printf("База данных отсортирована по убыванию стоимости.\n");
+}
+
+void delete_by_cost(struct Letter **letters, int *count, double cost) {
+    int found = 0;
+    for (int i = 0; i < *count; i++) {
+        if ((*letters)[i].cost == cost) {
+            // Освобождаем память, выделенную под поля структуры
+            free((*letters)[i].adr1);
+            free((*letters)[i].fam1);
+            free((*letters)[i].name1);
+            free((*letters)[i].adr2);
+            free((*letters)[i].fam2);
+            free((*letters)[i].name2);
+
+            // Сдвигаем элементы массива, чтобы заполнить место удаленного письма
+            for (int j = i; j < *count - 1; j++) {
+                (*letters)[j] = (*letters)[j + 1];
+            }
+
+            // Уменьшаем количество писем
+            (*count)--;
+
+            // Удаляем последнюю структуру из массива, чтобы избежать утечки памяти
+            *letters = (struct Letter *)realloc(*letters, (*count) * sizeof(struct Letter));
+
+            found = 1;
+            printf("Письмо с указанной стоимостью удалено.\n");
+            break; // Выходим из цикла, так как письмо найдено и удалено
+        }
+    }
+
+    if (!found) {
+        printf("Письмо с указанной стоимостью не найдено.\n");
+    }
+}
+
+// Функция для сохранения базы данных в файл
+void save_database(struct Letter *letters, int count, const char *filename) {
+    FILE *file = fopen(filename, "w"); // Открываем файл для записи
+    if (file == NULL) {
+        printf("Ошибка открытия файла для записи.\n");
+        return;
+    }
+
+    fprintf(file, "%d\n", count); // Сохраняем количество писем
+
+    // Сохраняем информацию о каждом письме
+    for (int i = 0; i < count; i++) {
+        fprintf(file, "%s\n%s\n%s\n%s\n%s\n%s\n%lf\n", 
+                letters[i].adr1, letters[i].fam1, letters[i].name1,
+                letters[i].adr2, letters[i].fam2, letters[i].name2,
+                letters[i].cost);
+    }
+
+    fclose(file); // Закрываем файл
+    printf("База данных сохранена в файл %s.\n", filename);
+}
+
+// Функция для загрузки базы данных из файла
+int load_database(struct Letter **letters, const char *filename) {
+    FILE *file = fopen(filename, "r"); // Открываем файл для чтения
+    if (file == NULL) {
+        printf("Файл не найден. Будет создана новая база данных.\n");
+        return 0; // Возвращаем 0 писем
+    }
+
+    int count;
+    fscanf(file, "%d\n", &count); // Читаем количество писем
+
+    *letters = (struct Letter *)malloc(count * sizeof(struct Letter)); // Выделяем память под письма
+
+    // Читаем информацию о каждом письме
+    for (int i = 0; i < count; i++) {
+        char buffer[1024];
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0;
+        (*letters)[i].adr1 = strdup(buffer);
+
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0;
+        (*letters)[i].fam1 = strdup(buffer);
+
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0;
+        (*letters)[i].name1 = strdup(buffer);
+
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0;
+        (*letters)[i].adr2 = strdup(buffer);
+
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0;
+        (*letters)[i].fam2 = strdup(buffer);
+
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0;
+        (*letters)[i].name2 = strdup(buffer);
+
+        fscanf(file, "%lf\n", &(*letters)[i].cost);
+    }
+
+    fclose(file); // Закрываем файл
+    printf("База данных загружена из файла %s.\n", filename);
+    return count; // Возвращаем количество писем
 }
 
 int main() {
-    struct Letter *letters = NULL; // Указатель на базу данных писем (изначально NULL)
-    int count = 0; // Количество писем в базе (изначально 0)
-    int choice; // Переменная для хранения выбора пользователя
+    struct Letter *letters = NULL;
+    int count = 0;
+    int choice;
 
-    // Цикл меню
-    while (1) { // Бесконечный цикл, пока пользователь не выберет выход
-        printf("Меню:\n"); // Вывод меню на экран
+    // Загрузка базы данных из файла
+    count = load_database(&letters, "database.txt");
+
+    while (1) {
+        printf("Меню:\n");
         printf("1. Добавить письмо\n");
         printf("2. Распечатать базу данных\n");
         printf("3. Поиск по отправителю\n");
         printf("4. Поиск по стоимости\n");
         printf("5. Сортировать по стоимости\n");
-        printf("6. Выход\n");
+        printf("6. Удалить письмо по стоимости\n");
+        printf("7. Сохранить базу данных\n"); // Добавлен пункт меню для сохранения
+        printf("8. Выход\n");
         printf("Выберите действие: ");
-        scanf("%d", &choice); // Чтение выбора пользователя с клавиатуры
-        getchar(); // Очищаем буфер ввода от символа новой строки
+        scanf("%d", &choice);
+        getchar();
 
-        switch (choice) { // Ветвление в зависимости от выбора пользователя
-            case 1: // Добавление письма
-                count = add_letter(&letters, count); // Вызов функции добавления письма
-                break; // Выход из switch
-            case 2: // Печать базы данных
-                print_letters(letters, count); // Вызов функции печати базы данных
-                break; // Выход из switch
-            case 3: { // Поиск по отправителю
-                char fam2[1024], name2[1024]; // Буферы для хранения фамилии и имени отправителя
+        switch (choice) {
+            case 1:
+                count = add_letter(&letters, count);
+                break;
+            case 2:
+                print_letters(letters, count);
+                break;
+            case 3: {
+                char fam2[1024], name2[1024];
                 printf("Введите фамилию отправителя: ");
-                fgets(fam2, sizeof(fam2), stdin); // Чтение фамилии отправителя с клавиатуры
-                fam2[strcspn(fam2, "\n")] = 0; // Удаление символа новой строки из буфера
+                fgets(fam2, sizeof(fam2), stdin);
+                fam2[strcspn(fam2, "\n")] = 0;
                 printf("Введите имя отправителя: ");
-                fgets(name2, sizeof(name2), stdin); // Чтение имени отправителя с клавиатуры
-                name2[strcspn(name2, "\n")] = 0; // Удаление символа новой строки из буфера
-                find_by_sender(letters, count, fam2, name2); // Вызов функции поиска по отправителю
-                break; // Выход из switch
+                fgets(name2, sizeof(name2), stdin);
+                name2[strcspn(name2, "\n")] = 0;
+                find_by_sender(letters, count, fam2, name2);
+                break;
             }
-            case 4: { // Поиск по стоимости
-                double min_cost; // Переменная для хранения минимальной стоимости
+            case 4: {
+                double min_cost;
                 printf("Введите минимальную стоимость: ");
-                scanf("%lf", &min_cost); // Чтение минимальной стоимости с клавиатуры
-                getchar(); // Очищаем буфер ввода от символа новой строки
-                find_by_cost(letters, count, min_cost); // Вызов функции поиска по стоимости
-                break; // Выход из switch
+                scanf("%lf", &min_cost);
+                getchar();
+                find_by_cost(letters, count, min_cost);
+                break;
             }
-            case 5: // Сортировка по стоимости
-                sort_by_cost(letters, count); // Вызов функции сортировки по стоимости
-                break; // Выход из switch
-            case 6: // Выход из программы
+            case 5:
+                sort_by_cost(letters, count);
+                break;
+            case 6: { 
+                double cost;
+                printf("Введите стоимость письма для удаления: ");
+                scanf("%lf", &cost);
+                getchar();
+                delete_by_cost(&letters, &count, cost); 
+                break;
+            }
+            case 7:
+                save_database(letters, count, "database.txt"); // Сохранение базы данных
+                break;
+            case 8:
                 // Освобождаем память перед выходом
-                for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
-                    free(letters[i].adr1); // Освобождение памяти, выделенной под адрес получателя
-                    free(letters[i].fam1); // Освобождение памяти, выделенной под фамилию получателя
-                    free(letters[i].name1); // Освобождение памяти, выделенной под имя получателя
-                    free(letters[i].adr2); // Освобождение памяти, выделенной под адрес отправителя
-                    free(letters[i].fam2); // Освобождение памяти, выделенной под фамилию отправителя
-                    free(letters[i].name2); // Освобождение памяти, выделенной под имя отправителя
+                for (int i = 0; i < count; i++) {
+                    free(letters[i].adr1);
+                    free(letters[i].fam1);
+                    free(letters[i].name1);
+                    free(letters[i].adr2);
+                    free(letters[i].fam2);
+                    free(letters[i].name2);
                 }
-                free(letters); // Освобождение памяти, выделенной под массив структур
-                return 0; // Завершение программы
-            default: // Неверный выбор
-                printf("Неверный выбор.\n"); // Вывод сообщения об ошибке
+                free(letters);
+                return 0;
+            default:
+                printf("Неверный выбор.\n");
         }
     }
 }
